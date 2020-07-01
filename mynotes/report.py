@@ -1,4 +1,6 @@
-import csv
+
+from fileparse import parse_csv
+
 
 def read_portfolio_tuple(filename):
     
@@ -18,39 +20,12 @@ def read_portfolio_tuple(filename):
     return portfolio
     
 def read_portfolio(filename):
-    
-    portfolio = []
-    
-    if len(filename) == 0:
-        return portfolio
         
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        
-        for row in rows:
-            row_dict = dict(zip(headers,row))
-            
-            row_dict['shares'] = int(row_dict['shares'])
-            row_dict['price'] = float(row_dict['price'])
-            portfolio.append(row_dict)
-    
-    return portfolio
+    return parse_csv(filename, select=['name','shares','price'], types=[str,int,float], has_headers = True)
     
 def read_prices(filename):
-    
-    prices = {}
-    
-    if len(filename) == 0:
-        return prices
         
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        for line in rows:
-            if len(line) >0:
-                prices[line[0]] = float(line[1])
-    
-    return prices
+    return dict(parse_csv(filename, types=[str,float]))
         
 def calc_actual_cost(portfolio_file, price_file, prefix = '../Work/Data/'):
     
@@ -90,7 +65,12 @@ def make_report(portfolio, price):
                 position_gain_lost = position_cost - item['shares'] * item['price']
             except ValueError:
                 print(f'Row {rowno}: Bad row {item}')    
-        stock_list.append((item['name'],item['shares'],position_price,position_price - item['price'] ,position_gain_lost))     
+        stock_list.append((item['name'], 
+                        item['shares'], 
+                        position_price, 
+                        position_price - item['price'], 
+                        position_gain_lost)
+                            )     
         total_cost += position_cost
         gain_lost += position_gain_lost
     stock_list.append(('----------', '----------', '----------', '----------', '----------'))
