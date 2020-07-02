@@ -89,9 +89,6 @@ def print_report(report, total_cost, total_gain_lost, formatter):
                 'Price', 
                 'Change', 
                 'Gain/Lost']
-    # headers_len = len(headers)
-    # print('%10s '*headers_len % headers)
-    # print(('-'*10 + ' ')*headers_len)
 
     formatter.headings(headers)
 
@@ -118,8 +115,6 @@ def print_report(report, total_cost, total_gain_lost, formatter):
                 ' '*10, 
                 'Gain/lost', 
                 f'{total_gain_lost:>10.2f}']
-    # print(('-'*10 + ' ')*len(footer))
-    # print('%10s '*len(footer) % footer)
     formatter.footings(footers)
 
 def portfolio_report(portfoliofile, pricefile, fmt='txt'):
@@ -134,14 +129,7 @@ def portfolio_report(portfoliofile, pricefile, fmt='txt'):
     report, total_cost, total_gain_lost = make_report_data(portfolio, prices)
 
     # Print it out
-    if fmt == 'txt':
-        formatter = tableformat.TextTableFormatter()
-    elif fmt == 'csv':
-        formatter = tableformat.CSVTableFormatter()
-    elif fmt == 'html':
-        formatter = tableformat.HTMLTableFormatter()
-    else:
-        raise RuntimeError(f'Unknow format {fmt}')
+    formatter = tableformat.createformatter(fmt)
                 
     print_report(report, total_cost, total_gain_lost, formatter)
 
