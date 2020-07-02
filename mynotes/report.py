@@ -22,13 +22,22 @@ def read_portfolio_tuple(filename):
     
     return portfolio
     
+
 def read_portfolio(filename):
-        
-    return parse_csv(filename, select=['name','shares','price'], types=[str,int,float], has_headers = True)
+    import os
+
+    data_path = os.environ['PY_DATA'] + '/' + filename
+    
+    with open(data_path, 'rt') as source:
+        return parse_csv(source, select=['name','shares','price'], types=[str,int,float], has_headers = True)
     
 def read_prices(filename):
+    import os
+
+    data_path = os.environ['PY_DATA'] + '/' + filename
         
-    return dict(parse_csv(filename, types=[str,float]))
+    with open(data_path, 'rt') as source:
+        return dict(parse_csv(source, types=[str,float]))
         
 def calc_actual_cost(portfolio_file, price_file, prefix = '../Work/Data/'):
     
