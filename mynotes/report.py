@@ -4,25 +4,20 @@
 
 from fileparse import parse_csv
 import stock
+import tableformat
 
-
-def read_portfolio_tuple(filename):
     
-    portfolio = []
+def str_to_date(str):
+    import datetime
+    return datetime.datetime.strptime(str, '%m/%d/%Y')
     
-    if len(filename) == 0:
-        return portfolio
-        
-    with open(filename, 'rt') as f:
-        rows = csv.reader(f)
-        headers = next(rows)
-        
-        for row in rows:
-            holding = (row[0], int(row[1]), float(row[2]))
-            portfolio.append(holding)
+def str_to_time(str):
+    import datetime
+    return datetime.datetime.strptime(str, '%I:%M%p')
     
-    return portfolio
-    
+def strdate_to_tuple(strdate):
+    return tuple( int(val) for val in strdate.split('/') )
+# portfolio = [ { colname: types[index](row[index]) for colname, index in zip(select, indices) } for row in rows ]
 
 def read_portfolio(filename):
     import os
@@ -60,13 +55,11 @@ def calc_actual_cost(portfolio_file, price_file):
     
     return total_cost, gain_lost
             
-def make_report(portfolio, price):
+def make_report_data(portfolio, price):
        
     total_cost = 0.0
     gain_lost = 0.0
     stock_list = []
-    stock_list.append(('Name', 'Shares', 'Price', 'Change', 'Gain/Lost'))
-    stock_list.append(('----------', '----------', '----------', '----------', '----------'))
     
     for rowno, item in enumerate(portfolio):
         position_cost = item.cost()
@@ -87,57 +80,82 @@ def make_report(portfolio, price):
                             )     
         total_cost += position_cost
         gain_lost += position_gain_lost
-    stock_list.append(('----------', '----------', '----------', '----------', '----------'))
-    stock_list.append(('Total cost', total_cost, '----------', 'Gain/Lost ', gain_lost))
-    return stock_list
     
-def print_report(report):
-    len_report = len(report)
-    row0 = report[0]
-    print(f'{row0[0]:>10s} {row0[1]:>10s} {row0[2]:>10s} {row0[3]:>10s} {row0[4]:>10s}')
-    row0 = report[1]
-    print(f'{row0[0]:>10s} {row0[1]:>10s} {row0[2]:>10s} {row0[3]:>10s} {row0[4]:>10s}')
+    return stock_list, total_cost, gain_lost
+    
+def print_report(report, total_cost, total_gain_lost, formatter):
+    headers =   ['Name', 
+                'Shares', 
+                'Price', 
+                'Change', 
+                'Gain/Lost']
+    # headers_len = len(headers)
+    # print('%10s '*headers_len % headers)
+    # print(('-'*10 + ' ')*headers_len)
+
+    formatter.headings(headers)
 
     try:
         for row, item in enumerate(report):
-            if row < 2:
-                continue
-            
-            if row == len_report-2:
-                break
-                
             name, shares, price, change, gain_lost = item
-            print(f'{name:>10s} {shares:>10d} {price:>10.2f} {change:>10.2f} {gain_lost:>10.2f}')
+            rowdata =  [f'{name}', 
+                        f'{shares:d}', 
+                        f'{price:0.2f}', 
+                        f'{change:0.2f}', 
+                        f'{gain_lost:0.2f}']
+            if isinstance(formatter, tableformat.TextTableFormatter):            
+                rowdata =  [f'{name:>10s}', 
+                            f'{shares:>10d}', 
+                            f'{price:>10.2f}', 
+                            f'{change:>10.2f}', 
+                            f'{gain_lost:>10.2f}']
+            formatter.row(rowdata)
     except ValueError:
         print(f'Row {row}: Bad row {item}') 
-            
-    row0 = report[len_report - 2]
-    print(f'{row0[0]:>10s} {row0[1]:>10s} {row0[2]:>10s} {row0[3]:>10s} {row0[4]:>10s}')
     
-    row0 = report[len_report - 1]
-    print(f'{row0[0]:>10s} {row0[1]:>10.2f} {row0[2]:>10s} {row0[3]:>10s} {row0[4]:>10.2f}')
-   
+    footers =    ['Total cost', 
+                f'{total_cost:>10.2f}', 
+                ' '*10, 
+                'Gain/lost', 
+                f'{total_gain_lost:>10.2f}']
+    # print(('-'*10 + ' ')*len(footer))
+    # print('%10s '*len(footer) % footer)
+    formatter.footings(footers)
 
-    
-def str_to_date(str):
-    import datetime
-    return datetime.datetime.strptime(str, '%m/%d/%Y')
-    
-def str_to_time(str):
-    import datetime
-    return datetime.datetime.strptime(str, '%I:%M%p')
-    
-def strdate_to_tuple(strdate):
-    return tuple( int(val) for val in strdate.split('/') )
-# portfolio = [ { colname: types[index](row[index]) for colname, index in zip(select, indices) } for row in rows ]
+def portfolio_report(portfoliofile, pricefile, fmt='txt'):
+    '''
+    Make a stock report given portfolio and price data files.
+    '''
+    # Read data files
+    portfolio = read_portfolio(portfoliofile)
+    prices = read_prices(pricefile)
+
+    # Create the report data
+    report, total_cost, total_gain_lost = make_report_data(portfolio, prices)
+
+    # Print it out
+    if fmt == 'txt':
+        formatter = tableformat.TextTableFormatter()
+    elif fmt == 'csv':
+        formatter = tableformat.CSVTableFormatter()
+    elif fmt == 'html':
+        formatter = tableformat.HTMLTableFormatter()
+    else:
+        raise RuntimeError(f'Unknow format {fmt}')
+                
+    print_report(report, total_cost, total_gain_lost, formatter)
 
 def main(argv):
     
-    if len(argv) != 3:
-        print(f'Wrong parametrs number, expected 2 received {len(argv)-1}')
+    arglen = len(argv)
+    
+    if arglen < 3:
+        print(f'Wrong parametrs number, expected 2 or more received {arglen-1}')
         return
-
-    print_report(make_report(read_portfolio(argv[1]), read_prices(argv[2])))
+    if arglen > 3:    
+        portfolio_report(argv[1], argv[2], fmt=argv[3])
+    else:
+        portfolio_report(argv[1], argv[2])
     
         
         
