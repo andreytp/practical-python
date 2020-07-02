@@ -241,10 +241,16 @@ def parse_csv(filename, select=None, types=None, has_headers=False, silence_erro
     '''
     Parse a CSV file into a list of records
     '''
+    
+    import os
+    
+    data_path = os.environ['PY_DATA'] + '/' + filename
+    
+    
     if select and not has_headers:
         raise RuntimeError("select argument requires column headers")
     
-    with open(filename) as f:
+    with open(data_path) as f:
         rows = csv.reader(f, delimiter = delimiter_)
 
         # Read the file headers

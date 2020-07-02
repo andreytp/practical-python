@@ -1,3 +1,6 @@
+#!python3
+#report.py
+
 
 from fileparse import parse_csv
 
@@ -103,15 +106,30 @@ def print_report(report):
     row0 = report[len_report - 1]
     print(f'{row0[0]:>10s} {row0[1]:>10.2f} {row0[2]:>10s} {row0[3]:>10s} {row0[4]:>10.2f}')
    
-import datetime
 
     
 def str_to_date(str):
+    import datetime
     return datetime.datetime.strptime(str, '%m/%d/%Y')
     
 def str_to_time(str):
+    import datetime
     return datetime.datetime.strptime(str, '%I:%M%p')
     
 def strdate_to_tuple(strdate):
     return tuple( int(val) for val in strdate.split('/') )
 # portfolio = [ { colname: types[index](row[index]) for colname, index in zip(select, indices) } for row in rows ]
+
+def main(argv):
+    
+    if len(argv) != 3:
+        print(f'Wrong parametrs number, expected 2 received {len(argv)-1}')
+        return
+
+    print_report(make_report(read_portfolio(argv[1]), read_prices(argv[2])))
+    
+        
+        
+if __name__ == '__main__':
+        import sys
+        main(sys.argv)

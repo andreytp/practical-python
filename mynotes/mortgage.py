@@ -1,3 +1,4 @@
+#!python3
 # mortgage.py
 
 principal = 500000.0
