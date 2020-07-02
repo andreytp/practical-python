@@ -317,7 +317,7 @@ def parse_csv(source, select=None, types=None, has_headers=False, silence_errors
         raise RuntimeError("select argument requires column headers")
     
     # with open(data_path) as f:
-    from io import IOBase
+    # from io import IOBase
     
     # rows = source
     #
@@ -372,5 +372,4 @@ def parse_csv(source, select=None, types=None, has_headers=False, silence_errors
                 
         records.append(record)
 
-    return records
-        
+    return records        

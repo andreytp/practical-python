@@ -6,10 +6,9 @@ def portfolio_cost(filename):
     import report
     import os
     
-    data_path = os.environ['PY_DATA'] + '/' + filename
-    portfolio = report.read_portfolio(data_path)
+    portfolio = report.read_portfolio(filename)
     
-    return sum([item['shares'] * item['price'] for item in portfolio])
+    return sum([item.cost() for item in portfolio])
     
 def main(argv):
     

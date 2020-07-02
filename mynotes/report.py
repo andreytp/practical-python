@@ -3,6 +3,7 @@
 
 
 from fileparse import parse_csv
+import stock
 
 
 def read_portfolio_tuple(filename):
@@ -29,7 +30,8 @@ def read_portfolio(filename):
     data_path = os.environ['PY_DATA'] + '/' + filename
     
     with open(data_path, 'rt') as source:
-        return parse_csv(source, select=['name','shares','price'], types=[str,int,float], has_headers = True)
+        portdicts = parse_csv(source, select=['name','shares','price'], types=[str,int,float], has_headers = True)
+        return [stock.Stock(s['name'], s['shares'], s['price']) for s in portdicts]
     
 def read_prices(filename):
     import os
@@ -39,7 +41,7 @@ def read_prices(filename):
     with open(data_path, 'rt') as source:
         return dict(parse_csv(source, types=[str,float]))
         
-def calc_actual_cost(portfolio_file, price_file, prefix = '../Work/Data/'):
+def calc_actual_cost(portfolio_file, price_file):
     
     price = read_prices(prefix+price_file)
     portfolio = read_portfolio(prefix+portfolio_file)
@@ -48,11 +50,11 @@ def calc_actual_cost(portfolio_file, price_file, prefix = '../Work/Data/'):
     gain_lost = 0.0
     
     for item in portfolio:
-        position_cost = item['shares'] * item['price']
+        position_cost = item.cost()
         position_gain_lost = 0
         if item['name'] in price:
-            position_cost = item['shares'] * price[item['name']]
-            position_gain_lost = position_cost - item['shares'] * item['price'] 
+            position_cost = item.shares * price[item.name]
+            position_gain_lost = position_cost - item.cost() 
         total_cost += position_cost
         gain_lost += position_gain_lost
     
@@ -67,20 +69,20 @@ def make_report(portfolio, price):
     stock_list.append(('----------', '----------', '----------', '----------', '----------'))
     
     for rowno, item in enumerate(portfolio):
-        position_cost = item['shares'] * item['price']
+        position_cost = item.cost()
         position_gain_lost = 0
-        position_price = item['price']
-        if item['name'] in price:
+        position_price = item.price
+        if item.name in price:
             try:
-                position_price = price[item['name']]
-                position_cost = item['shares'] * position_price
-                position_gain_lost = position_cost - item['shares'] * item['price']
+                position_price = price[item.name]
+                position_cost = item.shares * position_price
+                position_gain_lost = position_cost - item.cost()
             except ValueError:
                 print(f'Row {rowno}: Bad row {item}')    
-        stock_list.append((item['name'], 
-                        item['shares'], 
+        stock_list.append((item.name, 
+                        item.shares, 
                         position_price, 
-                        position_price - item['price'], 
+                        position_price - item.price, 
                         position_gain_lost)
                             )     
         total_cost += position_cost
