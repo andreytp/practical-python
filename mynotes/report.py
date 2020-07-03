@@ -4,7 +4,8 @@
 
 from fileparse import parse_csv
 import stock
-import tableformat
+
+
 
     
 def str_to_date(str):
@@ -21,12 +22,13 @@ def strdate_to_tuple(strdate):
 
 def read_portfolio(filename):
     import os
+    from portfolio import Portfolio
 
     data_path = os.environ['PY_DATA'] + '/' + filename
     
     with open(data_path, 'rt') as source:
         portdicts = parse_csv(source, select=['name','shares','price'], types=[str,int,float], has_headers = True)
-        return [stock.Stock(s['name'], s['shares'], s['price']) for s in portdicts]
+        return Portfolio([stock.Stock(s['name'], s['shares'], s['price']) for s in portdicts])
     
 def read_prices(filename):
     import os
@@ -45,11 +47,11 @@ def calc_actual_cost(portfolio_file, price_file):
     gain_lost = 0.0
     
     for item in portfolio:
-        position_cost = item.cost()
+        position_cost = item.cost
         position_gain_lost = 0
         if item['name'] in price:
             position_cost = item.shares * price[item.name]
-            position_gain_lost = position_cost - item.cost() 
+            position_gain_lost = position_cost - item.cost 
         total_cost += position_cost
         gain_lost += position_gain_lost
     
@@ -62,14 +64,14 @@ def make_report_data(portfolio, price):
     stock_list = []
     
     for rowno, item in enumerate(portfolio):
-        position_cost = item.cost()
+        position_cost = item.cost
         position_gain_lost = 0
         position_price = item.price
         if item.name in price:
             try:
                 position_price = price[item.name]
                 position_cost = item.shares * position_price
-                position_gain_lost = position_cost - item.cost()
+                position_gain_lost = position_cost - item.cost
             except ValueError:
                 print(f'Row {rowno}: Bad row {item}')    
         stock_list.append((item.name, 
@@ -84,6 +86,8 @@ def make_report_data(portfolio, price):
     return stock_list, total_cost, gain_lost
     
 def print_report(report, total_cost, total_gain_lost, formatter):
+    from tableformat import TextTableFormatter 
+    
     headers =   ['Name', 
                 'Shares', 
                 'Price', 
@@ -91,7 +95,7 @@ def print_report(report, total_cost, total_gain_lost, formatter):
                 'Gain/Lost']
 
     formatter.headings(headers)
-
+    
     try:
         for row, item in enumerate(report):
             name, shares, price, change, gain_lost = item
@@ -100,7 +104,9 @@ def print_report(report, total_cost, total_gain_lost, formatter):
                         f'{price:0.2f}', 
                         f'{change:0.2f}', 
                         f'{gain_lost:0.2f}']
-            if isinstance(formatter, tableformat.TextTableFormatter):            
+                        
+                      
+            if isinstance(formatter, TextTableFormatter):            
                 rowdata =  [f'{name:>10s}', 
                             f'{shares:>10d}', 
                             f'{price:>10.2f}', 
@@ -121,15 +127,16 @@ def portfolio_report(portfoliofile, pricefile, fmt='txt'):
     '''
     Make a stock report given portfolio and price data files.
     '''
+    
     # Read data files
     portfolio = read_portfolio(portfoliofile)
     prices = read_prices(pricefile)
 
     # Create the report data
     report, total_cost, total_gain_lost = make_report_data(portfolio, prices)
-
+    from tableformat import create_formatter
     # Print it out
-    formatter = tableformat.createformatter(fmt)
+    formatter = create_formatter(fmt)
                 
     print_report(report, total_cost, total_gain_lost, formatter)
 

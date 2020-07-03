@@ -37,4 +37,4 @@ class Stock:
         self._shares -= count
         
     def __repr__(self):
-        return f'Stock(\'{self.name}\', {self._shares:d}, {self._price:0.2})'    
+        return f'Stock(\'{self.name}\', {self._shares:d}, {self.price:0.2f}'    

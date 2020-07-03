@@ -8,7 +8,7 @@ def portfolio_cost(filename):
     
     portfolio = report.read_portfolio(filename)
     
-    return sum([item.cost() for item in portfolio])
+    return portfolio.total_cost
     
 def main(argv):
     
