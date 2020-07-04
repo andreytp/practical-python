@@ -23,10 +23,16 @@ class TableFormatter:
         
 class TextTableFormatter(TableFormatter):
     def headings(self, headers):
+        line = ""
+        data = ""
+        
         for h in headers:
-            print(f'{h:10s}', end=' ')
-        print()
-        print(('-'*10 + ' ')*len(headers))
+            line += ('-'*10 + ' ')
+            data += f'{h:>10s} '
+        
+        print(data)    
+        print(line)
+
         
     def row(self, rowdata):
         for d in rowdata:
@@ -34,10 +40,15 @@ class TextTableFormatter(TableFormatter):
         print()
         
     def footings(self, footers):
-        print(('-'*10 + ' ')*len(footers))
+        line = ""
+        data = ""
+        
         for f in footers:
-            print(f'{f:10s}', end=' ')
-        print()
+            line += ('-'*10 + ' ')
+            data += f'{f:>10s} '
+            
+        print(line)
+        print(data)
     
 class CSVTableFormatter(TableFormatter):
     def headings(self, headers):
@@ -82,7 +93,14 @@ def create_formatter(fmt):
 def print_table(collection, fields, formatter):
     
     formatter.headings(fields)
+    count = 0
     for item in collection:
+        
+        if count > 36:
+            count = 0
+            print()
+            formatter.headings(fields)
+            
         rowdata = []
         # print(item)
         for field in fields:
@@ -90,6 +108,7 @@ def print_table(collection, fields, formatter):
             # print(strval)
             rowdata.append(strval)
         formatter.row(rowdata)
+        count += 1
         
 def value_format(value):
     if isinstance(value, int):

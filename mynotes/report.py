@@ -5,9 +5,7 @@
 from fileparse import parse_csv
 import stock
 
-
-
-    
+   
 def str_to_date(str):
     import datetime
     return datetime.datetime.strptime(str, '%m/%d/%Y')

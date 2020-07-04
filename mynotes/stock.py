@@ -2,7 +2,7 @@
 
 class Stock:
     
-    __slots__=('name', '_shares', 'price')
+    # __slots__=('name', '_shares', 'price')
     
     def __init__(self, name, shares, price):
         self.name = name
@@ -37,4 +37,4 @@ class Stock:
         self._shares -= count
         
     def __repr__(self):
-        return f'Stock(\'{self.name}\', {self._shares:d}, {self.price:0.2f}'    
+        return f'Stock(\'{self.name}\', {self._shares:d}, {self.price:0.2f})'
