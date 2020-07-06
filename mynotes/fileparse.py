@@ -177,8 +177,7 @@ def parse_csv_step4(filename, select=None, types=None, has_headers=False, delimi
             records.append(record)
 
     return records
-    
-    
+        
 def parse_csv_step5(filename, select=None, types=None, has_headers=False, delimiter_=','):
     '''
     Parse a CSV file into a list of records
@@ -303,25 +302,26 @@ def parse_csv_step6(filename, select=None, types=None, has_headers=False, silenc
 
     return records
     
-def parse_csv(source, select=None, types=None, has_headers=False, silence_errors=True, delimiter_=','):
+def parse_csv(source, select=None, types=None, **opts ):
     '''
     Parse a CSV file into a list of records
     '''
+    has_headers=False
+    silence_errors=True
+    delimiter_=','
     
-    # import os
-    #
-    # data_path = os.environ['PY_DATA'] + '/' + filename
-    
-    
+    if 'has_header' in opts.keys():
+        has_headers = opts['has_header']
+        
+    if 'silence_errors' in opts.keys():
+        silence_errors = opts['silence_errors']
+        
+    if 'delimiter' in opts.keys():
+        delimiter = opts['delimiter']
+        
     if select and not has_headers:
         raise RuntimeError("select argument requires column headers")
-    
-    # with open(data_path) as f:
-    # from io import IOBase
-    
-    # rows = source
-    #
-    # if isinstance(source, IOBase):
+
     rows = csv.reader(source, delimiter = delimiter_)
 
         # Read the file headers

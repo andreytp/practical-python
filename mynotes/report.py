@@ -18,23 +18,28 @@ def strdate_to_tuple(strdate):
     return tuple( int(val) for val in strdate.split('/') )
 # portfolio = [ { colname: types[index](row[index]) for colname, index in zip(select, indices) } for row in rows ]
 
-def read_portfolio(filename):
+def read_portfolio(filename, **opts):
     import os
     from portfolio import Portfolio
 
     data_path = os.environ['PY_DATA'] + '/' + filename
     
     with open(data_path, 'rt') as source:
-        portdicts = parse_csv(source, select=['name','shares','price'], types=[str,int,float], has_headers = True)
-        return Portfolio([stock.Stock(s['name'], s['shares'], s['price']) for s in portdicts])
+        
+        portdicts = parse_csv(source, 
+                                select=['name','shares','price'], 
+                                types=[str,int,float],
+                                has_header = True, 
+                                **opts)
+        return Portfolio([stock.Stock(**portdict) for portdict in portdicts])
     
-def read_prices(filename):
+def read_prices(filename, **opts):
     import os
 
     data_path = os.environ['PY_DATA'] + '/' + filename
         
     with open(data_path, 'rt') as source:
-        return dict(parse_csv(source, types=[str,float]))
+        return dict(parse_csv(source, types=[str,float], **opts))
         
 def calc_actual_cost(portfolio_file, price_file):
     
