@@ -25,13 +25,7 @@ def read_portfolio(filename, **opts):
     data_path = os.environ['PY_DATA'] + '/' + filename
     
     with open(data_path, 'rt') as source:
-        
-        portdicts = parse_csv(source, 
-                                select=['name','shares','price'], 
-                                types=[str,int,float],
-                                has_header = True, 
-                                **opts)
-        return Portfolio([stock.Stock(**portdict) for portdict in portdicts])
+         return Portfolio.from_csv(source, **opts)
     
 def read_prices(filename, **opts):
     import os

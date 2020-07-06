@@ -310,8 +310,8 @@ def parse_csv(source, select=None, types=None, **opts ):
     silence_errors=True
     delimiter_=','
     
-    if 'has_header' in opts:
-        has_headers = opts['has_header']
+    if 'has_headers' in opts:
+        has_headers = opts['has_headers']
         
     if 'silence_errors' in opts:
         silence_errors = opts['silence_errors']
