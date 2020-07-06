@@ -310,13 +310,13 @@ def parse_csv(source, select=None, types=None, **opts ):
     silence_errors=True
     delimiter_=','
     
-    if 'has_header' in opts.keys():
+    if 'has_header' in opts:
         has_headers = opts['has_header']
         
-    if 'silence_errors' in opts.keys():
+    if 'silence_errors' in opts:
         silence_errors = opts['silence_errors']
         
-    if 'delimiter' in opts.keys():
+    if 'delimiter' in opts:
         delimiter = opts['delimiter']
         
     if select and not has_headers:
