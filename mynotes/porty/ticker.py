@@ -1,6 +1,6 @@
 #ticker.py
 
-from follow import follow
+from .follow import follow
 import csv
 
 def convert_types(rows, indices):
@@ -19,7 +19,7 @@ def make_dicts(rows, indices):
         
 def make_stocks(rows, indices):
     
-    from stock import Stock
+    from .stock import Stock
     for row in rows:
         selectnames = get_names(indices)
         fieldname = next(selectnames)    
@@ -34,7 +34,7 @@ def select_columns(rows, indices):
     return ( (row[index] for index in indices) for row in rows )
 
 def get_portfolio_symbols():
-    import report
+    from . import report
     portfolio = report.read_portfolio('portfolio.csv')
     return list(set(item.name for item in portfolio))
     
@@ -63,8 +63,8 @@ def ticker(fmt):
     lines = follow('stocklog.csv')
     rows = parse_stock_data(lines, indices)
     
-    from tableformat import create_formatter
-    from tableformat import print_table
+    from .tableformat import create_formatter
+    from .tableformat import print_table
     
     formatter = create_formatter(fmt)
     print_table(rows, list(get_names(indices)), formatter)

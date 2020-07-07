@@ -1,9 +1,8 @@
 #!python3
 #report.py
 
-
-from fileparse import parse_csv
-import stock
+from .fileparse import parse_csv
+from . import stock
 
    
 def str_to_date(str):
@@ -20,7 +19,7 @@ def strdate_to_tuple(strdate):
 
 def read_portfolio(filename, **opts):
     import os
-    from portfolio import Portfolio
+    from .portfolio import Portfolio
 
     data_path = os.environ['PY_DATA'] + '/' + filename
     
@@ -83,7 +82,7 @@ def make_report_data(portfolio, price):
     return stock_list, total_cost, gain_lost
     
 def print_report(report, total_cost, total_gain_lost, formatter):
-    from tableformat import TextTableFormatter 
+    from .tableformat import TextTableFormatter 
     
     headers =   ['Name', 
                 'Shares', 
@@ -131,7 +130,7 @@ def portfolio_report(portfoliofile, pricefile, fmt='txt'):
 
     # Create the report data
     report, total_cost, total_gain_lost = make_report_data(portfolio, prices)
-    from tableformat import create_formatter
+    from .tableformat import create_formatter
     # Print it out
     formatter = create_formatter(fmt)
                 

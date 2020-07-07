@@ -3,7 +3,7 @@
 
 
 def portfolio_cost(filename):
-    import report
+    from . import report
     import os
     
     portfolio = report.read_portfolio(filename)

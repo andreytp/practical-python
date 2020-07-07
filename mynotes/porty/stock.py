@@ -1,7 +1,7 @@
 #stock.py
 
 
-from typedproperty import *
+from .typedproperty import *
 
 class Stock:
     
